@@ -54,3 +54,36 @@ def separate_audio(url, model_choice):
         return "جداسازی با موفقیت انجام شد!"
     except Exception as e:
         return f"خطا: {str(e)}"
+def combine_and_clean(audio_files):
+    if len(audio_files) < 2:
+        return "حداقل دو فایل صوتی نیاز است!"
+    
+    try:
+        # ترکیب فایل‌ها
+        combined_audio = None
+        for file in audio_files:
+            audio = AudioSegment.from_file(file.name)
+            if combined_audio is None:
+                combined_audio = audio
+            else:
+                combined_audio += audio
+        
+        # حذف سکوت‌ها
+        chunks = split_on_silence(
+            combined_audio,
+            min_silence_len=1000,
+            silence_thresh=-40,
+            keep_silence=100
+        )
+        
+        # ترکیب قطعات بدون سکوت
+        final_audio = chunks[0]
+        for chunk in chunks[1:]:
+            final_audio += chunk
+            
+        output_path = "output/combined_vocals.wav"
+        final_audio.export(output_path, format="wav")
+        
+        return output_path
+    except Exception as e:
+        return f"خطا: {str(e)}"
