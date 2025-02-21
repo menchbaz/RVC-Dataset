@@ -91,7 +91,7 @@ def combine_and_clean(use_uploaded_files, uploaded_files=None):
     except Exception as e:
         return f"خطا: {str(e)}"
 
-def process_audio():
+def process_audio(echo_reduction=0.85, presence=0.15):
     try:
         input_path = "output/combined_vocals.wav"
         if not os.path.exists(input_path):
@@ -102,7 +102,7 @@ def process_audio():
         echo_reduced = nr.reduce_noise(
             y=audio,
             sr=sr,
-            prop_decrease=0.85,
+            prop_decrease=echo_reduction,
             stationary=False,
             n_fft=2048,
             win_length=2048,
@@ -114,7 +114,7 @@ def process_audio():
         
         filtered = filtfilt(b1, a1, echo_reduced)
         high_freq = filtfilt(b2, a2, echo_reduced) * 0.2
-        enhanced = filtered + (high_freq * 0.15)
+        enhanced = filtered + (high_freq * presence)
         
         final_audio = librosa.util.normalize(enhanced) * 0.95
         
@@ -149,9 +149,12 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
         combine_button.click(combine_and_clean, [use_uploaded, audio_files], combined_output)
     
     with gr.Tab("پردازش نهایی"):
+        with gr.Row():
+            echo_slider = gr.Slider(minimum=0.7, maximum=0.95, value=0.85, label="میزان حذف اکو")
+            presence_slider = gr.Slider(minimum=0.1, maximum=0.3, value=0.15, label="میزان حضور صدا")
         process_button = gr.Button("شروع پردازش")
         final_output = gr.Audio(label="خروجی نهایی")
-        process_button.click(process_audio, None, final_output)
+        process_button.click(process_audio, [echo_slider, presence_slider], final_output)
 
     gr.Markdown("""
     ### 🎥 ما را در یوتیوب دنبال کنید
