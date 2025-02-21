@@ -87,3 +87,36 @@ def combine_and_clean(audio_files):
         return output_path
     except Exception as e:
         return f"خطا: {str(e)}"
+def process_audio(input_audio, echo_reduction=0.85, presence=0.15):
+    try:
+        # خواندن فایل صوتی
+        audio, sr = librosa.load(input_audio.name, sr=44100, mono=True)
+        
+        # حذف اکو
+        echo_reduced = nr.reduce_noise(
+            y=audio,
+            sr=sr,
+            prop_decrease=echo_reduction,
+            stationary=False,
+            n_fft=2048,
+            win_length=2048,
+            n_std_thresh_stationary=1.2
+        )
+        
+        # تنظیم فضای طبیعی
+        b1, a1 = butter(2, [200/22050, 8000/22050], btype='band')
+        b2, a2 = butter(2, 4000/22050, btype='high')
+        
+        filtered = filtfilt(b1, a1, echo_reduced)
+        high_freq = filtfilt(b2, a2, echo_reduced) * 0.2
+        enhanced = filtered + (high_freq * presence)
+        
+        # نرمالایز نهایی
+        final_audio = librosa.util.normalize(enhanced) * 0.95
+        
+        output_path = "output/final_processed.wav"
+        sf.write(output_path, final_audio, sr, 'PCM_24')
+        
+        return output_path
+    except Exception as e:
+        return f"خطا: {str(e)}"
