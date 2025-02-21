@@ -150,8 +150,8 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
     
     with gr.Tab("پردازش نهایی"):
         with gr.Row():
-            echo_slider = gr.Slider(minimum=0.7, maximum=0.95, value=0.85, label="میزان حذف اکو")
-            presence_slider = gr.Slider(minimum=0.1, maximum=0.3, value=0.15, label="میزان حضور صدا")
+            echo_slider = gr.Slider(minimum=0.7, maximum=0.95, value=0.9, label="میزان حذف اکو")
+            presence_slider = gr.Slider(minimum=0.1, maximum=0.3, value=0.1, label="میزان حضور صدا")
         process_button = gr.Button("شروع پردازش")
         final_output = gr.Audio(label="خروجی نهایی")
         process_button.click(process_audio, [echo_slider, presence_slider], final_output)
