@@ -27,11 +27,12 @@ def separate_audio(url_or_files, model_choice):
                     'preferredquality': '192',
                 }],
                 'outtmpl': os.path.join('temp', '%(title)s.%(ext)s'),
-                'restrictfilenames': True  # This will ensure safe filenames
+                'restrictfilenames': True
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url_or_files])
-            input_files = [f for f in os.listdir('temp') if f.endswith('.wav')]
+            input_files = [os.path.join('temp', f) for f in os.listdir('temp') if f.endswith('.wav')]
+
 
         else:
             # آپلود مستقیم فایل‌ها
