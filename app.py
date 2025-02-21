@@ -19,7 +19,6 @@ if not os.path.exists('models/drumsep.th'):
 def separate_audio(url_or_files, model_choice):
     try:
         if isinstance(url_or_files, str) and url_or_files.startswith('http'):
-            # دانلود از یوتیوب
             ydl_opts = {
                 'format': 'bestaudio/best',
                 'postprocessors': [{
@@ -28,10 +27,12 @@ def separate_audio(url_or_files, model_choice):
                     'preferredquality': '192',
                 }],
                 'outtmpl': os.path.join('temp', '%(title)s.%(ext)s'),
+                'restrictfilenames': True  # This will ensure safe filenames
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url_or_files])
             input_files = [f for f in os.listdir('temp') if f.endswith('.wav')]
+
         else:
             # آپلود مستقیم فایل‌ها
             input_files = [f.name for f in url_or_files]
