@@ -91,7 +91,7 @@ def combine_and_clean(use_uploaded_files, uploaded_files=None):
     except Exception as e:
         return f"خطا: {str(e)}"
 
-def process_audio(echo_reduction=0.85, presence=0.15):
+def process_audio(echo_reduction=0.9, presence=0.1):
     try:
         input_path = "output/combined_vocals.wav"
         if not os.path.exists(input_path):
