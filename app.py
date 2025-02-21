@@ -120,3 +120,36 @@ def process_audio(input_audio, echo_reduction=0.85, presence=0.15):
         return output_path
     except Exception as e:
         return f"خطا: {str(e)}"
+# تعریف رابط کاربری
+with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
+    gr.Markdown("# 🎵 پردازشگر حرفه‌ای صدا")
+    
+    with gr.Tab("جداسازی صدا"):
+        url_input = gr.Textbox(label="لینک ویدیو")
+        model_choice = gr.Dropdown(
+            choices=["BS-Roformer-1297", "BS-Roformer-1296", "Mel-Roformer-1143"],
+            label="انتخاب مدل",
+            value="BS-Roformer-1297"
+        )
+        separate_button = gr.Button("شروع جداسازی")
+        separate_output = gr.Textbox(label="نتیجه")
+        separate_button.click(separate_audio, [url_input, model_choice], separate_output)
+    
+    with gr.Tab("ترکیب صداها"):
+        audio_files = gr.File(file_count="multiple", label="انتخاب فایل‌های صوتی")
+        combine_button = gr.Button("ترکیب و حذف سکوت")
+        combined_output = gr.Audio(label="خروجی")
+        combine_button.click(combine_and_clean, audio_files, combined_output)
+    
+    with gr.Tab("پردازش نهایی"):
+        input_audio = gr.File(label="انتخاب فایل صوتی")
+        with gr.Row():
+            echo_slider = gr.Slider(minimum=0.7, maximum=0.95, value=0.85, label="میزان حذف اکو")
+            presence_slider = gr.Slider(minimum=0.1, maximum=0.3, value=0.15, label="میزان حضور صدا")
+        process_button = gr.Button("شروع پردازش")
+        final_output = gr.Audio(label="خروجی نهایی")
+        process_button.click(process_audio, [input_audio, echo_slider, presence_slider], final_output)
+
+# اجرای برنامه
+if __name__ == "__main__":
+    app.launch(share=True)
