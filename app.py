@@ -134,7 +134,7 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
     
     with gr.Tab("جداسازی صدا"):
         url_input = gr.Textbox(label="لینک ویدیو (اختیاری)")
-        file_input = gr.File(file_count="multiple", type="audio", label="آپلود فایل‌های صوتی")
+        file_input = gr.File(file_count="multiple", file_types=[".wav", ".mp3", ".flac"], label="آپلود فایل‌های صوتی")
         model_choice = gr.Dropdown(choices=["BS-Roformer-1297", "BS-Roformer-1296", "Mel-Roformer-1143"], label="انتخاب مدل", value="BS-Roformer-1297")
         separate_button = gr.Button("شروع جداسازی")
         separate_output = gr.Textbox(label="نتیجه")
