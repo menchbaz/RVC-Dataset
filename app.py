@@ -139,17 +139,18 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
     gr.Markdown("# 🎵 پردازشگر حرفه‌ای صدا")
     
     with gr.Tab("جداسازی صدا"):
-        gr.Markdown("لینک یوتیوب یا آپلود مستقیم فایل‌ها")
-        url_input = gr.Textbox(label="لینک ویدیو (اختیاری)")
-        file_input = gr.File(file_count="multiple", label="آپلود فایل‌ها (اختیاری)")
-        model_choice = gr.Dropdown(
-            choices=["BS-Roformer-1297", "BS-Roformer-1296", "Mel-Roformer-1143"],
-            label="انتخاب مدل",
-            value="BS-Roformer-1297"
-        )
-        separate_button = gr.Button("شروع جداسازی")
-        separate_output = gr.Textbox(label="نتیجه")
-        separate_button.click(separate_audio, [url_input, model_choice], separate_output)
+    gr.Markdown("لینک یوتیوب یا آپلود مستقیم فایل‌ها")
+    url_input = gr.Textbox(label="لینک ویدیو (اختیاری)")
+    file_input = gr.File(file_count="multiple", label="آپلود فایل‌ها (اختیاری)")
+    model_choice = gr.Dropdown(
+        choices=["BS-Roformer-1297", "BS-Roformer-1296", "Mel-Roformer-1143"],
+        label="انتخاب مدل",
+        value="BS-Roformer-1297"
+    )
+    separate_button = gr.Button("شروع جداسازی")
+    separate_output = gr.Textbox(label="نتیجه")
+    separate_button.click(separate_audio, inputs=[file_input, model_choice], outputs=separate_output)
+
     
     with gr.Tab("ترکیب صداها"):
         use_uploaded = gr.Checkbox(label="استفاده از فایل‌های آپلودی", value=False)
