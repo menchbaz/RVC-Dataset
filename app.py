@@ -38,34 +38,53 @@ def download_audio_from_youtube(url):
         return str(e)
 
 def separate_audio(url_or_files, model_choice):
-    setup_directories()
-    download_model()
     try:
+        input_files = []
+
+        # اگر یوتیوب لینک بود، دانلود کن
         if isinstance(url_or_files, str) and url_or_files.startswith('http'):
-            input_files = download_audio_from_youtube(url_or_files)
-        else:
-            input_files = [f.name if hasattr(f, "name") else f for f in url_or_files]
-        
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'wav',
+                    'preferredquality': '192',
+                }],
+                'outtmpl': os.path.join('temp', '%(title)s.%(ext)s'),
+                'restrictfilenames': True
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url_or_files])
+            input_files = [os.path.join('temp', f) for f in os.listdir('temp') if f.endswith('.wav')]
+
+        # اگر فایل‌های آپلودی بودن، مسیرشون رو درست کن
+        elif isinstance(url_or_files, list):
+            for f in url_or_files:
+                file_path = os.path.join("temp", f.name)
+                with open(file_path, "wb") as out_file:
+                    out_file.write(f.read())
+                input_files.append(file_path)
+
+        if not input_files:
+            return "خطا: فایلی برای پردازش یافت نشد!"
+
         models = {
             'BS-Roformer-1297': 'model_bs_roformer_ep_317_sdr_12.9755.ckpt',
             'BS-Roformer-1296': 'model_bs_roformer_ep_368_sdr_12.9628.ckpt',
             'Mel-Roformer-1143': 'model_mel_band_roformer_ep_3005_sdr_11.4360.ckpt'
         }
-        # اگر فایل‌ها از طریق آپلود اومدن، اون‌ها رو ذخیره کن
-if isinstance(url_or_files, list):
-    input_files = []
-    for f in url_or_files:
-        file_path = os.path.join("temp", f.name)
-        with open(file_path, "wb") as out_file:
-            out_file.write(f.read())
-        input_files.append(file_path)
 
         for file in input_files:
             os.system(f'audio-separator "{file}" --model_filename {models[model_choice]} --output_dir=output')
             if file.startswith('temp/'):
                 os.remove(file)
 
+        # بررسی اینکه خروجی تولید شده یا نه
+        if not any(fname.endswith(".wav") for fname in os.listdir("output")):
+            return "خطا: پردازش انجام نشد، لطفاً دوباره امتحان کنید."
+
         return "جداسازی با موفقیت انجام شد!"
+    
     except Exception as e:
         return f"خطا: {str(e)}"
 
