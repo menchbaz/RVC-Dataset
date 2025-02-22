@@ -160,6 +160,5 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
     ### 🎥 ما را در یوتیوب دنبال کنید
     [![YouTube Channel](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@aigolden)
     """)
-
 if __name__ == "__main__":
-    app.launch(share=True, server_port=7860, server_name="0.0.0.0")
+    app.launch(share=True)
