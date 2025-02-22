@@ -162,4 +162,4 @@ with gr.Blocks(title="پردازشگر حرفه‌ای صدا") as app:
     """)
 
 if __name__ == "__main__":
-    app.launch(share=True)
+    app.launch(share=True, server_port=7860, server_name="0.0.0.0", server_timeout=3600)
