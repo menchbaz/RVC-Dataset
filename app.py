@@ -44,13 +44,21 @@ def separate_audio(url_or_files, model_choice):
         if isinstance(url_or_files, str) and url_or_files.startswith('http'):
             input_files = download_audio_from_youtube(url_or_files)
         else:
-            input_files = [f.name for f in url_or_files]
+            input_files = [f.name if hasattr(f, "name") else f for f in url_or_files]
         
         models = {
             'BS-Roformer-1297': 'model_bs_roformer_ep_317_sdr_12.9755.ckpt',
             'BS-Roformer-1296': 'model_bs_roformer_ep_368_sdr_12.9628.ckpt',
             'Mel-Roformer-1143': 'model_mel_band_roformer_ep_3005_sdr_11.4360.ckpt'
         }
+        # اگر فایل‌ها از طریق آپلود اومدن، اون‌ها رو ذخیره کن
+if isinstance(url_or_files, list):
+    input_files = []
+    for f in url_or_files:
+        file_path = os.path.join("temp", f.name)
+        with open(file_path, "wb") as out_file:
+            out_file.write(f.read())
+        input_files.append(file_path)
 
         for file in input_files:
             os.system(f'audio-separator "{file}" --model_filename {models[model_choice]} --output_dir=output')
