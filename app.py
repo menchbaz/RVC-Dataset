@@ -32,26 +32,36 @@ def separate_audio(url_or_files, model_choice):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url_or_files])
             input_files = [os.path.join('temp', f) for f in os.listdir('temp') if f.endswith('.wav')]
-
-
         else:
-            # آپلود مستقیم فایل‌ها
-            input_files = [f.name for f in url_or_files]
+            input_files = []
+            for file in url_or_files:
+                file_path = file.name
+                output_path = os.path.join('temp', os.path.basename(file_path))
+                shutil.copy(file_path, output_path)
+                input_files.append(output_path)
 
-        models = {
+        if not input_files:
+            return "No audio files found to process"
+
+        dictmodel = {
             'BS-Roformer-1297': 'model_bs_roformer_ep_317_sdr_12.9755.ckpt',
             'BS-Roformer-1296': 'model_bs_roformer_ep_368_sdr_12.9628.ckpt',
             'Mel-Roformer-1143': 'model_mel_band_roformer_ep_3005_sdr_11.4360.ckpt'
         }
+        roformer_model = dictmodel[model_choice]
 
-        for file in input_files:
-            os.system(f'audio-separator "{file}" --model_filename {models[model_choice]} --output_dir=output')
-            if file.startswith('temp/'):
-                os.remove(file)
+        for file_path in input_files:
+            prompt = f'audio-separator "{file_path}" --model_filename {roformer_model} --output_dir=output --output_format=wav'
+            os.system(prompt)
 
-        return "جداسازی با موفقیت انجام شد!"
+        temp_files = glob.glob("temp/*")
+        for file in temp_files:
+            os.remove(file)
+
+        return "Audio separation completed successfully!"
     except Exception as e:
-        return f"خطا: {str(e)}"
+        return f"Error: {str(e)}"
+
 
 def combine_and_clean(use_uploaded_files, uploaded_files=None):
     try:
